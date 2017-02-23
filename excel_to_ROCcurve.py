@@ -1,11 +1,7 @@
-#
-# エクセルファイルよりROCカーブを算出
-# 有料ソフトがライセンス切れしたのを期に作った
-# 探したけどこのよなのは無かった
-# 
-# by namuyan
-# 
-# ver 0.01
+# excelファイル読み込み
+# -i Missense_variant_on_All.xlsx -x 1
+# -i allmu_roc.xlsx  -x 2
+
 
 
 import argparse
@@ -44,8 +40,8 @@ def main(inputf, index=0):
         n_float = q
         n_int = q + 1
         result = get_roc_element(data_array, n_float=n_float, n_int=n_int)
-        roc_curve = np.array([[data_array[0][q], ""],["", ""]], dtype=np.float32) #1
-        roc_curve = np.concatenate((roc_curve, [["FP rate", "TP rate"]]), axis=0) #2
+        roc_curve = np.array([[data_array[0][q], ""], ["AUC", 0], ["sensitivity", 0], ["specificity", 0]]) #0 1 2 3
+        roc_curve = np.concatenate((roc_curve, [["FP rate", "TP rate"]]), axis=0) #4
         for p in result:
             TP = p[1]
             FP = p[2]
@@ -58,11 +54,21 @@ def main(inputf, index=0):
                 print("TP FP TN FN:", p)
         #pp.pprint(roc_curve)
         auc = 0
+        h = 0
+        sensitive = 0
+        specificity = 0
         for r in range(len(result)):
             try:
-                auc += math.fabs(float(roc_curve[r + 3, 0]) - float(roc_curve[r + 4, 0])) * float(roc_curve[r + 3, 1])
+                auc += math.fabs(float(roc_curve[r + 5, 0]) - float(roc_curve[r + 6, 0])) * float(roc_curve[r + 5, 1])
+                h_tmp = float(roc_curve[r + 5, 1]) - float(roc_curve[r + 5, 0])# TP - FP
+                if h < h_tmp:
+                    h = h_tmp
+                    sensitive = float(roc_curve[r + 5, 0])
+                    specificity = float(roc_curve[r + 5, 1])
             except:
-                roc_curve[1, 0] = round(auc * 100, 2)
+                roc_curve[1, 1] = round(auc , 4)
+                roc_curve[2, 1] = round(sensitive, 4)
+                roc_curve[3, 1] = round(specificity, 4)
                 #print("# AUC ", auc)
                 break
         if q == 0:
@@ -83,7 +89,11 @@ def write2xls(fname, data):
     for p in range(0, len(data) - 1):
         # p行、q列目にデータを書き込み
         for q in range(0, len(data[p]) ):
-            newSheet.write(p, q, data[p][q])
+            try:
+                data_tmp = float(data[p][q])
+            except:
+                data_tmp = str(data[p][q])
+            newSheet.write(p, q, data_tmp)
     book.save(write_name)
 
 def get_roc_element(data_array, n_range=500, n_float=0, n_int=1):
