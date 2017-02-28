@@ -28,6 +28,10 @@ Anaconda3を入れていれば問題ありません。
 インデックスは０から始まりますのでご注意ください。
 
 
+## 更新
+2017/02/23 公開  
+2017/02/28 入力データの自動スケーリング、いくつかの表記を修正  
+
 ## Licence
 
 [MIT](https://github.com/tcnksm/tool/blob/master/LICENCE)
