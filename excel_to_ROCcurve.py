@@ -104,10 +104,12 @@ def write2xls(fname, data):
 
 def get_roc_element(data_array, n_range=1000, n_float=0, n_int=1):
     result = []
-    n_max = np.max(data_array[1:, n_int].astype(np.float64))
-    n_min = np.min(data_array[1:, n_int].astype(np.float64))
-    print("# Max, Min:", n_max, n_min)
-    for sensitive in np.arange(n_min, n_max, (n_max - n_min) / n_range):
+    # 欠損値を含むとエラーになるのでコメントアウト
+    # n_max = np.max(data_array[1:, n_float].astype(np.float64))
+    # n_min = np.min(data_array[1:, n_float].astype(np.float64))
+    # print("# Max, Min:", n_max, n_min)
+    # for sensitive in np.arange(n_min, n_max, (n_max - n_min) / n_range):
+    for sensitive in np.arange(0, 1, 1 / n_range):
         TP = 0
         FP = 0
         TN = 0
